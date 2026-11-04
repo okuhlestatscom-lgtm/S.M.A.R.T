@@ -1,0 +1,6 @@
+{
+  "name": "S.M.A.R.T - Sound Ministry and Reformation Tools",
+  "description": "Apostolic and prophetic resources, sound doctrine teachings, books by Nicholas Dlamini, ministerial whereabouts, personalized My Library bookmarking, and live event alerts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
