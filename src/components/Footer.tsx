@@ -1,18 +1,21 @@
 import React from 'react';
-import { Flame, ShieldCheck, Mail, MapPin, Bell, Bookmark, MessageCircle, ExternalLink, ShieldAlert } from 'lucide-react';
+import { Flame, ShieldCheck, Mail, MapPin, Bell, Bookmark, MessageCircle, ExternalLink, ShieldAlert, Download } from 'lucide-react';
 import { WHATSAPP_NUMBER, FACEBOOK_URL } from './WhatsAppWidget';
 import { YOUTUBE_CHANNEL_URL } from '../data/smartData';
+import { downloadOfflineHtmlService } from '../services/downloadOfflineHtmlService';
 
 interface FooterProps {
   onNavigate: (tab: string) => void;
   onOpenSubscribe: () => void;
   onOpenAdmin: () => void;
+  onOpenOfflineHtml?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   onNavigate,
   onOpenSubscribe,
   onOpenAdmin,
+  onOpenOfflineHtml,
 }) => {
   return (
     <footer className="bg-slate-950 border-t border-slate-800/80 pt-16 pb-12 text-slate-400 text-xs">
@@ -92,6 +95,15 @@ export const Footer: React.FC<FooterProps> = ({
               Apostolic Vault
             </h4>
             <ul className="space-y-2.5">
+              <li>
+                <button
+                  onClick={() => onNavigate('catalog')}
+                  className="hover:text-amber-400 transition-colors text-left text-amber-300 font-semibold flex items-center gap-1.5"
+                >
+                  <span>Content Catalog & Tags</span>
+                  <span className="text-[10px] bg-amber-500/20 px-1.5 py-0.2 rounded font-mono">5 formats</span>
+                </button>
+              </li>
               <li>
                 <button
                   onClick={() => onNavigate('teachings')}
@@ -198,7 +210,16 @@ export const Footer: React.FC<FooterProps> = ({
               </button>
             </div>
 
-            <div className="pt-2 border-t border-slate-800">
+            <div className="pt-2 border-t border-slate-800 space-y-2">
+              <button
+                onClick={() => onOpenOfflineHtml ? onOpenOfflineHtml() : downloadOfflineHtmlService.downloadStandaloneHtml()}
+                className="w-full py-2 px-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                title="Download or view full standalone HTML app"
+              >
+                <Download className="w-3.5 h-3.5 text-amber-400" />
+                <span>Download Standalone HTML</span>
+              </button>
+
               <button
                 onClick={onOpenAdmin}
                 className="w-full py-2 px-3 bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-600/40 text-xs font-semibold rounded-xl transition-colors flex items-center justify-center gap-1.5"

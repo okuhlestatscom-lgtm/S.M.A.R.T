@@ -122,7 +122,8 @@ class GoogleAuthService {
     };
     this.currentUser = updatedUser;
     localStorage.setItem('smart_current_user_v1', JSON.stringify(updatedUser));
-    this.notify();
+    // Do NOT call this.notify() here: this is a background storage backup, not an authentication state change.
+    // Calling notify() triggers setCurrentUser which causes a circular render loop in React.
 
     return backup;
   }

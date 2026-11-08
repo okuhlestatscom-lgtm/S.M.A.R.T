@@ -1,11 +1,13 @@
 import React from 'react';
-import { Flame, Compass, BookOpen, MapPin, Radio, ArrowRight, ShieldCheck, CheckCircle2, Bookmark } from 'lucide-react';
+import { Flame, Compass, BookOpen, MapPin, Radio, ArrowRight, ShieldCheck, CheckCircle2, Bookmark, Tags, Download } from 'lucide-react';
+import { downloadOfflineHtmlService } from '../services/downloadOfflineHtmlService';
 
 interface HeroSectionProps {
   onNavigate: (tab: string) => void;
   onOpenLive: () => void;
   onOpenSubscribe: () => void;
   savedCount: number;
+  onOpenOfflineHtml?: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
@@ -13,6 +15,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onOpenLive,
   onOpenSubscribe,
   savedCount,
+  onOpenOfflineHtml,
 }) => {
   return (
     <div className="relative overflow-hidden pt-8 pb-16 lg:pb-24">
@@ -114,11 +117,28 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               </button>
 
               <button
+                onClick={() => onOpenOfflineHtml ? onOpenOfflineHtml() : downloadOfflineHtmlService.downloadStandaloneHtml()}
+                className="px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/30 hover:from-amber-500/30 text-amber-300 font-bold text-xs border border-amber-500/50 transition-all flex items-center gap-2 whitespace-nowrap shrink-0 shadow-md cursor-pointer"
+                title="Download or view self-contained offline HTML file"
+              >
+                <Download className="w-4 h-4 text-amber-400" />
+                <span>Download Offline HTML</span>
+              </button>
+
+              <button
                 onClick={() => onNavigate('teachings')}
                 className="px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white font-medium text-xs border border-slate-700 transition-colors flex items-center gap-2 whitespace-nowrap shrink-0"
               >
                 <span>Teachings Vault</span>
                 <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+              </button>
+              
+              <button
+                onClick={() => onNavigate('catalog')}
+                className="px-4 py-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-semibold text-xs border border-amber-500/40 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 shadow-sm"
+              >
+                <Tags className="w-3.5 h-3.5 text-amber-400" />
+                <span>5 Categories & Tags</span>
               </button>
               
               <button

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Bell, Flame, ShieldAlert, Bookmark, UserCheck, MessageCircle, Globe, ExternalLink, ShieldCheck, User, WifiOff } from 'lucide-react';
+import { Bell, Flame, ShieldAlert, Bookmark, UserCheck, MessageCircle, Globe, ExternalLink, ShieldCheck, User, WifiOff, Download } from 'lucide-react';
 import { NotificationItem, UserProfile, YOUTUBE_CHANNEL_URL } from '../data/smartData';
 import { WHATSAPP_NUMBER, FACEBOOK_URL } from './WhatsAppWidget';
 import { PWAInstallButton } from './PWAInstallButton';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
+import { downloadOfflineHtmlService } from '../services/downloadOfflineHtmlService';
 
 interface HeaderProps {
   activeTab: string;
@@ -15,6 +16,7 @@ interface HeaderProps {
   onOpenAdmin: () => void;
   onOpenSubscribe: () => void;
   onOpenGoogleAuth: () => void;
+  onOpenOfflineHtml?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -27,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAdmin,
   onOpenSubscribe,
   onOpenGoogleAuth,
+  onOpenOfflineHtml,
 }) => {
   const unreadCount = notifications.filter((n) => !n.read).length;
   const isOnline = useOnlineStatus();
@@ -81,6 +84,20 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             Teachings Vault
+          </button>
+          <button
+            onClick={() => setActiveTab('catalog')}
+            className={`whitespace-nowrap shrink-0 transition-colors py-1 border-b-2 flex items-center gap-1.5 ${
+              activeTab === 'catalog'
+                ? 'text-amber-400 border-amber-400 font-semibold'
+                : 'text-slate-300 border-transparent hover:text-white'
+            }`}
+            title="Browse all 5 content categories and thematic tags"
+          >
+            <span>Catalog & Tags</span>
+            <span className="px-1.5 py-0.2 bg-amber-500/20 text-amber-300 text-[10px] rounded-full font-mono font-bold">
+              5
+            </span>
           </button>
           <button
             onClick={() => setActiveTab('books')}
@@ -276,6 +293,17 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           )}
 
+          {/* Download Standalone Offline HTML Button */}
+          <button
+            onClick={() => onOpenOfflineHtml ? onOpenOfflineHtml() : downloadOfflineHtmlService.downloadStandaloneHtml()}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-amber-500 text-amber-300 hover:text-white transition-all text-xs font-semibold shadow-sm shrink-0 cursor-pointer"
+            title="Download complete portal as a standalone offline HTML file"
+          >
+            <Download className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden lg:inline">Download HTML</span>
+            <span className="lg:hidden">HTML</span>
+          </button>
+
           {/* PWA In-App Install Prompt */}
           <PWAInstallButton variant="nav" />
 
@@ -309,6 +337,14 @@ export const Header: React.FC<HeaderProps> = ({
           }`}
         >
           Teachings
+        </button>
+        <button
+          onClick={() => setActiveTab('catalog')}
+          className={`px-2.5 py-1 rounded-md whitespace-nowrap ${
+            activeTab === 'catalog' ? 'bg-amber-500/15 text-amber-400 font-semibold' : 'text-slate-400'
+          }`}
+        >
+          Catalog & Tags
         </button>
         <button
           onClick={() => setActiveTab('books')}
@@ -354,6 +390,14 @@ export const Header: React.FC<HeaderProps> = ({
               {savedBookmarksCount}
             </span>
           )}
+        </button>
+        <button
+          onClick={() => onOpenOfflineHtml ? onOpenOfflineHtml() : downloadOfflineHtmlService.downloadStandaloneHtml()}
+          className="px-2.5 py-1 rounded-md whitespace-nowrap flex items-center gap-1 bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30 cursor-pointer"
+          title="Download standalone offline HTML file"
+        >
+          <Download className="w-3 h-3 text-amber-400" />
+          <span>Save HTML</span>
         </button>
       </div>
     </header>

@@ -10,6 +10,7 @@ export interface Teaching {
   subtitle: string;
   format: 'audio' | 'video' | 'pdf';
   category: 'Apostolic Order' | 'Ministry Delay Traps' | 'Holy Ghost Fire' | 'Prophetic Accuracy' | 'Fivefold Architecture' | 'Sound Doctrine';
+  tags?: string[];
   author: string;
   date: string;
   duration: string;
@@ -34,6 +35,60 @@ export interface Teaching {
   isFeatured?: boolean;
 }
 
+export type MainContentCategory =
+  | 'All Resources'
+  | 'Teachings (PDF)'
+  | 'Teachings (Audio)'
+  | 'Teachings (Video)'
+  | 'Books'
+  | 'Ebooks';
+
+export interface CategoryMetadata {
+  id: MainContentCategory;
+  label: string;
+  description: string;
+  badgeColor: string;
+}
+
+export const CONTENT_CATEGORIES: CategoryMetadata[] = [
+  {
+    id: 'All Resources',
+    label: 'All Resources',
+    description: 'Complete apostolic vault of teachings, books, monographs, and videos',
+    badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+  },
+  {
+    id: 'Teachings (PDF)',
+    label: 'Teachings (PDF)',
+    description: 'Doctrinal study monographs, ordination manuals & apostolic transcripts',
+    badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+  },
+  {
+    id: 'Teachings (Audio)',
+    label: 'Teachings (Audio)',
+    description: 'Expository audio sermons, fire impartations & sticky sermon player',
+    badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+  },
+  {
+    id: 'Teachings (Video)',
+    label: 'Teachings (Video)',
+    description: 'Intense Word Sessions YouTube masterclasses with timestamped chapters',
+    badgeColor: 'bg-rose-500/10 text-rose-400 border-rose-500/30',
+  },
+  {
+    id: 'Books',
+    label: 'Books',
+    description: 'Physical print copies delivered nationwide via courier & PAXI',
+    badgeColor: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
+  },
+  {
+    id: 'Ebooks',
+    label: 'Ebooks',
+    description: 'Digital universal editions on Books2Read, Kindle, Apple Books & Kobo',
+    badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
+  },
+];
+
 export const extractYouTubeVideoId = (input?: string): string => {
   if (!input) return '';
   const trimmed = input.trim();
@@ -49,6 +104,7 @@ export interface Book {
   author: string;
   coverImage: string;
   type: 'Hardcover' | 'Paperback' | 'eBook' | 'Digital Universal Edition';
+  tags?: string[];
   publishYear: string;
   pages: number;
   price: string;
@@ -401,6 +457,7 @@ export const INITIAL_BOOKS: Book[] = [
     author: 'Nicholas Dlamini',
     coverImage: '/assets/books/cover_prosperity_covenant_1793484763847.jpg',
     type: 'Digital Universal Edition',
+    tags: ['#CovenantProsperity', '#SoundDoctrine', '#Redemption', '#Generosity', '#KingdomEconomics'],
     publishYear: 'Doctrinal Series',
     pages: 210,
     price: 'Digital Online',
@@ -431,6 +488,7 @@ export const INITIAL_BOOKS: Book[] = [
     author: 'Nicholas Dlamini',
     coverImage: '/assets/books/cover_ehud_1793484784084.jpg',
     type: 'Digital Universal Edition',
+    tags: ['#SpiritualWarfare', '#EhudDeliverer', '#PropheticStrategy', '#Judges3', '#KingdomBreakthrough'],
     publishYear: 'Prophetic Exposition',
     pages: 195,
     price: 'Digital Online',
@@ -461,6 +519,7 @@ export const INITIAL_BOOKS: Book[] = [
     author: 'Nicholas Dlamini',
     coverImage: '/assets/books/cover_serpent_1793484800245.jpg',
     type: 'Digital Universal Edition',
+    tags: ['#SpiritualWarfare', '#Deliverance', '#OvercomingHindrances', '#Luke1019', '#CrushingTheSerpent'],
     publishYear: 'Spiritual Warfare Series',
     pages: 220,
     price: 'Digital Online',
@@ -491,6 +550,7 @@ export const INITIAL_BOOKS: Book[] = [
     author: 'Nicholas Dlamini',
     coverImage: '/assets/books/cover_zion_people_1793484838886.jpg',
     type: 'Digital Universal Edition',
+    tags: ['#ZionPeople', '#ApostolicArchitecture', '#MelchizedekOrder', '#Hebrews12', '#HolyRemnant'],
     publishYear: 'Prophetic Destiny',
     pages: 240,
     price: 'Digital Online',
@@ -521,6 +581,7 @@ export const INITIAL_BOOKS: Book[] = [
     author: 'Nicholas Dlamini',
     coverImage: '/assets/books/cover_new_season_1793484855110.jpg',
     type: 'Digital Universal Edition',
+    tags: ['#NewSeason', '#PropheticKairos', '#DivineTransitions', '#Timing', '#SpiritualShifts'],
     publishYear: 'Prophetic Shift',
     pages: 185,
     price: 'Digital Online',
@@ -551,6 +612,7 @@ export const INITIAL_BOOKS: Book[] = [
     author: 'Nicholas Dlamini',
     coverImage: '/assets/books/cover_mantics_1793484868133.jpg',
     type: 'Digital Universal Edition',
+    tags: ['#PropheticEthics', '#TestingSpirits', '#PurityOfTheStream', '#ApostolicOrder', '#FalseDoctrines'],
     publishYear: 'Prophetic Ethics',
     pages: 205,
     price: 'Digital Online',
@@ -581,6 +643,7 @@ export const INITIAL_BOOKS: Book[] = [
     author: 'Nicholas Dlamini',
     coverImage: '/assets/aistudio/FB_IMG_1793479335252_6e135219.jpg',
     type: 'Paperback',
+    tags: ['#Leadership', '#FiveSenses', '#Discernment', '#Vision', '#ExecutiveWisdom'],
     publishYear: 'Executive Edition',
     pages: 184,
     price: 'R100',
@@ -624,6 +687,7 @@ export const INITIAL_TEACHINGS: Teaching[] = [
     subtitle: 'Why gifted ministers wander in the wilderness for decades and how to escape premature elevation',
     format: 'audio',
     category: 'Ministry Delay Traps',
+    tags: ['#MinistryDelays', '#ApostolicOrder', '#CharacterFormation', '#SpiritualFatherhood', '#Fivefold'],
     author: 'Apostle Nicholas Dlamini',
     date: 'October 28, 2026',
     duration: '52 min audio',
@@ -671,6 +735,7 @@ export const INITIAL_TEACHINGS: Teaching[] = [
     subtitle: 'From liturgical formality to burning apostolic altars: Rekindling corporate revival',
     format: 'video',
     category: 'Holy Ghost Fire',
+    tags: ['#HolyGhostFire', '#Revival', '#AltarProtocols', '#Pentecost', '#SpiritualAwakening'],
     author: 'Apostle Nicholas Dlamini',
     date: 'October 19, 2026',
     duration: '1h 14m masterclass',
@@ -702,6 +767,7 @@ export const INITIAL_TEACHINGS: Teaching[] = [
     subtitle: 'Structural alignment of apostles, prophets, evangelists, pastors, and teachers according to Ephesians 4',
     format: 'pdf',
     category: 'Fivefold Architecture',
+    tags: ['#FivefoldArchitecture', '#ApostolicOrder', '#Ephesians4', '#OrdinationHandbook', '#DoctrinalBlueprint'],
     author: 'Apostle Nicholas Dlamini',
     date: 'October 10, 2026',
     duration: '38 pages PDF',
@@ -745,6 +811,7 @@ export const INITIAL_TEACHINGS: Teaching[] = [
     subtitle: 'Navigating contemporary theological drift, syncretism, and hyper-grace illusions',
     format: 'audio',
     category: 'Sound Doctrine',
+    tags: ['#SoundDoctrine', '#Orthodoxy', '#Hermeneutics', '#FalseDoctrines', '#Truth'],
     author: 'Apostle Nicholas Dlamini',
     date: 'September 28, 2026',
     duration: '45 min audio',
@@ -766,6 +833,7 @@ export const INITIAL_TEACHINGS: Teaching[] = [
     subtitle: 'Restoring fear of the Lord in revelatory ministry and eliminating manipulation',
     format: 'video',
     category: 'Prophetic Accuracy',
+    tags: ['#PropheticAccuracy', '#EthicalBoundaries', '#TestingSpirits', '#DivinationWarning', '#PropheticMinistry'],
     author: 'Apostle Nicholas Dlamini',
     date: 'September 14, 2026',
     duration: '58 min session',
@@ -796,6 +864,7 @@ export const INITIAL_TEACHINGS: Teaching[] = [
     subtitle: 'Intense Word Sessions: Moving beyond sensationalism into biblical manifestation',
     format: 'video',
     category: 'Holy Ghost Fire',
+    tags: ['#SpiritualGifts', '#HolyGhostFire', '#Manifestation', '#IntenseWordSessions', '#SupernaturalProtocols'],
     author: 'Apostle Nicholas Dlamini',
     date: 'October 24, 2026',
     duration: '48 min masterclass',
@@ -827,6 +896,7 @@ export const INITIAL_TEACHINGS: Teaching[] = [
     subtitle: 'Intense Word Sessions: Dispelling darkness and establishing kingdom governance',
     format: 'video',
     category: 'Apostolic Order',
+    tags: ['#MinistryOfLight', '#KingdomGovernance', '#ApostolicIllumination', '#IntenseWordSessions'],
     author: 'Apostle Nicholas Dlamini',
     date: 'October 16, 2026',
     duration: '54 min masterclass',
@@ -858,6 +928,7 @@ export const INITIAL_TEACHINGS: Teaching[] = [
     subtitle: 'Intense Word Sessions: Moving from petitionary exhaustion to governmental intercession',
     format: 'video',
     category: 'Apostolic Order',
+    tags: ['#PropheticPrayer', '#AltarProtocols', '#CourtsOfHeaven', '#Intercession', '#IntenseWordSessions'],
     author: 'Apostle Nicholas Dlamini',
     date: 'October 08, 2026',
     duration: '1h 02m masterclass',
@@ -889,6 +960,7 @@ export const INITIAL_TEACHINGS: Teaching[] = [
     subtitle: 'Intense Word Sessions: A structured apostolic devotional journey into doctrinal alignment',
     format: 'video',
     category: 'Sound Doctrine',
+    tags: ['#40DaysInTheWord', '#SoundDoctrine', '#ScriptureImmersion', '#DoctrinalAlignment', '#IntenseWordSessions'],
     author: 'Apostle Nicholas Dlamini',
     date: 'September 20, 2026',
     duration: '1h 10m masterclass',
@@ -1406,8 +1478,8 @@ export const INITIAL_PETITIONS: PrayerPetition[] = [
 
 // LocalStorage helpers
 const STORAGE_KEYS = {
-  TEACHINGS: 'smart_teachings_v5',
-  BOOKS: 'smart_books_v5',
+  TEACHINGS: 'smart_teachings_v6',
+  BOOKS: 'smart_books_v6',
   ITINERARY: 'smart_itinerary_v4',
   NOTIFICATIONS: 'smart_notifications_v4',
   BOOKMARKS: 'smart_bookmarks_v2',
@@ -1418,6 +1490,70 @@ const STORAGE_KEYS = {
   JOURNAL: 'smart_journal_v1'
 };
 
+export const isTeachingInCategory = (teaching: Teaching, category: MainContentCategory): boolean => {
+  if (category === 'All Resources') return true;
+  if (category === 'Teachings (PDF)') return teaching.format === 'pdf';
+  if (category === 'Teachings (Audio)') return teaching.format === 'audio';
+  if (category === 'Teachings (Video)') return teaching.format === 'video';
+  return false;
+};
+
+export const isBookInCategory = (book: Book, category: MainContentCategory): boolean => {
+  if (category === 'All Resources') return true;
+  if (category === 'Books') {
+    // Physical print books: paperback/hardcover with print pricing & courier info
+    return book.type === 'Paperback' || book.type === 'Hardcover' || Boolean(book.courierFee);
+  }
+  if (category === 'Ebooks') {
+    // Universal digital editions, eReader / Books2Read links or eBook type
+    return book.type === 'eBook' || book.type === 'Digital Universal Edition' || Boolean(book.onlinePurchaseUrl);
+  }
+  return false;
+};
+
+export interface TagWithCount {
+  tag: string;
+  count: number;
+}
+
+export const getCategoryTags = (
+  category: MainContentCategory,
+  teachings: Teaching[],
+  books: Book[]
+): TagWithCount[] => {
+  const counts: Record<string, number> = {};
+
+  const processTags = (tags?: string[]) => {
+    if (!tags) return;
+    tags.forEach((rawTag) => {
+      const normalized = rawTag.trim();
+      if (!normalized) return;
+      counts[normalized] = (counts[normalized] || 0) + 1;
+    });
+  };
+
+  if (category === 'All Resources') {
+    teachings.forEach((t) => processTags(t.tags));
+    books.forEach((b) => processTags(b.tags));
+  } else if (
+    category === 'Teachings (PDF)' ||
+    category === 'Teachings (Audio)' ||
+    category === 'Teachings (Video)'
+  ) {
+    teachings
+      .filter((t) => isTeachingInCategory(t, category))
+      .forEach((t) => processTags(t.tags));
+  } else if (category === 'Books' || category === 'Ebooks') {
+    books
+      .filter((b) => isBookInCategory(b, category))
+      .forEach((b) => processTags(b.tags));
+  }
+
+  return Object.entries(counts)
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+};
+
 export const getStoredTeachings = (): Teaching[] => {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.TEACHINGS);
@@ -1425,10 +1561,15 @@ export const getStoredTeachings = (): Teaching[] => {
       return INITIAL_TEACHINGS;
     }
     const parsed: Teaching[] = JSON.parse(raw);
-    // Ensure newly added Intense Word Sessions are included if not present
     const existingIds = new Set(parsed.map((p) => p.id));
     const missing = INITIAL_TEACHINGS.filter((t) => !existingIds.has(t.id));
-    return [...parsed, ...missing];
+    return [...parsed, ...missing].map((t) => {
+      const canonical = INITIAL_TEACHINGS.find((c) => c.id === t.id);
+      return {
+        ...t,
+        tags: t.tags && t.tags.length > 0 ? t.tags : canonical?.tags || []
+      };
+    });
   } catch {
     return INITIAL_TEACHINGS;
   }
@@ -1456,21 +1597,25 @@ export const getStoredBooks = (): Book[] => {
     const raw = localStorage.getItem(STORAGE_KEYS.BOOKS);
     if (!raw) return INITIAL_BOOKS;
     const parsed: Book[] = JSON.parse(raw);
-    
-    // Purge any accidental ministry logo from cached book covers
-    return parsed.map((book) => {
+    const existingIds = new Set(parsed.map((b) => b.id));
+    const missing = INITIAL_BOOKS.filter((b) => !existingIds.has(b.id));
+
+    return [...parsed, ...missing].map((book) => {
       const canonical = INITIAL_BOOKS.find((b) => b.id === book.id);
-      if (
+      const coverImage =
         !book.coverImage ||
         book.coverImage.includes('file_000000007c2c8208b2cc5202023513b7') ||
         book.coverImage.includes('file_')
-      ) {
-        return {
-          ...book,
-          coverImage: canonical ? canonical.coverImage : book.coverImage
-        };
-      }
-      return book;
+          ? canonical
+            ? canonical.coverImage
+            : book.coverImage
+          : book.coverImage;
+
+      return {
+        ...book,
+        coverImage,
+        tags: book.tags && book.tags.length > 0 ? book.tags : canonical?.tags || []
+      };
     });
   } catch {
     return INITIAL_BOOKS;

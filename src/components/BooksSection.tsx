@@ -18,25 +18,50 @@ export const BooksSection: React.FC<BooksSectionProps> = ({
   onToggleBookmark,
 }) => {
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [downloadSuccess, setDownloadSuccess] = useState<Record<string, boolean>>({});
 
   const categories = [
     { id: 'all', label: `All Books (${books.length})` },
-    { id: 'online', label: 'Buy Online (Books2Read)' },
-    { id: 'print', label: 'Print Copies (SA Courier)' },
+    { id: 'print', label: 'Books (Print Copies)' },
+    { id: 'ebook', label: 'Ebooks (Universal Digital)' },
     { id: 'Marketplace & Governance', label: 'Marketplace & Economics' },
     { id: 'Prayer & Intercession', label: 'Prayer & Intercession' },
     { id: 'Spiritual Warfare & Deliverance', label: 'Spiritual Warfare' },
+    { id: 'Apostolic Architecture', label: 'Apostolic Architecture' },
+    { id: 'Leadership', label: 'Leadership' },
   ];
+
+  // Aggregate tags for books
+  const availableTags = useMemo(() => {
+    const counts: Record<string, number> = {};
+    books.forEach((b) => {
+      (b.tags || []).forEach((tag) => {
+        counts[tag] = (counts[tag] || 0) + 1;
+      });
+    });
+    return Object.entries(counts)
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [books]);
 
   const filteredBooks = useMemo(() => {
     return books.filter((book) => {
-      if (activeCategory === 'all') return true;
-      if (activeCategory === 'online') return Boolean(book.onlinePurchaseUrl);
-      if (activeCategory === 'print') return Boolean(book.courierFee || book.price.startsWith('R'));
-      return book.category === activeCategory;
+      let matchesCategory = true;
+      if (activeCategory === 'all') matchesCategory = true;
+      else if (activeCategory === 'ebook' || activeCategory === 'online') {
+        matchesCategory = Boolean(book.onlinePurchaseUrl || book.type === 'eBook' || book.type === 'Digital Universal Edition');
+      } else if (activeCategory === 'print') {
+        matchesCategory = Boolean(book.courierFee || book.price.startsWith('R') || book.type === 'Paperback' || book.type === 'Hardcover');
+      } else {
+        matchesCategory = book.category === activeCategory;
+      }
+
+      const matchesTag = !selectedTag || (book.tags || []).includes(selectedTag);
+
+      return matchesCategory && matchesTag;
     });
-  }, [books, activeCategory]);
+  }, [books, activeCategory, selectedTag]);
 
   const handleDownloadSample = (book: Book) => {
     const content = `=====================================================
@@ -142,11 +167,13 @@ Author: Apostle Nicholas Dlamini | S.M.A.R.T
       </div>
 
       {/* Category Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-8 text-xs font-medium">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 text-xs font-medium">
         {categories.map((cat) => (
           <button
             key={cat.id}
-            onClick={() => setActiveCategory(cat.id)}
+            onClick={() => {
+              setActiveCategory(cat.id);
+            }}
             className={`px-3.5 py-1.5 rounded-lg transition-colors whitespace-nowrap shrink-0 ${
               activeCategory === cat.id
                 ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
@@ -157,6 +184,37 @@ Author: Apostle Nicholas Dlamini | S.M.A.R.T
           </button>
         ))}
       </div>
+
+      {/* Thematic Tags Filter Strip */}
+      {availableTags.length > 0 && (
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-3 mb-8 text-xs">
+          <span className="text-slate-500 shrink-0 font-mono text-[11px] mr-1">
+            Filter by Tag:
+          </span>
+          {selectedTag && (
+            <button
+              onClick={() => setSelectedTag(null)}
+              className="px-2.5 py-0.5 rounded-md bg-amber-500 text-slate-950 text-[11px] font-bold shrink-0 flex items-center gap-1"
+            >
+              <span>{selectedTag}</span>
+              <span>×</span>
+            </button>
+          )}
+          {availableTags.map(({ tag, count }) => (
+            <button
+              key={tag}
+              onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+              className={`px-2.5 py-1 rounded-md text-[11px] font-mono transition-colors whitespace-nowrap shrink-0 ${
+                selectedTag === tag
+                  ? 'bg-amber-500 text-slate-950 font-bold'
+                  : 'bg-slate-900/80 border border-slate-800 text-slate-300 hover:border-amber-500/40 hover:text-amber-300'
+              }`}
+            >
+              {tag} <span className="opacity-60 text-[10px]">({count})</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Books Grid */}
       <div className="space-y-10">
@@ -258,6 +316,25 @@ Author: Apostle Nicholas Dlamini | S.M.A.R.T
                   <p className="text-sm text-slate-300 leading-relaxed">
                     {book.synopsis}
                   </p>
+
+                  {/* Thematic Tags */}
+                  {(book.tags || []).length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {book.tags?.map((tag) => (
+                        <button
+                          key={tag}
+                          onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+                          className={`text-[11px] font-mono px-2.5 py-0.5 rounded-md transition-colors ${
+                            selectedTag === tag
+                              ? 'bg-amber-500 text-slate-950 font-bold'
+                              : 'bg-slate-950 border border-slate-800 text-slate-300 hover:text-amber-300'
+                          }`}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Key Takeaways */}
                   <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">

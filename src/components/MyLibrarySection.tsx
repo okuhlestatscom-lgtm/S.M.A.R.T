@@ -27,6 +27,7 @@ import { PrayerJournalView } from './PrayerJournalView';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { offlineCacheService } from '../services/offlineCacheService';
 import { PWAInstallButton } from './PWAInstallButton';
+import { downloadOfflineHtmlService } from '../services/downloadOfflineHtmlService';
 
 interface MyLibrarySectionProps {
   savedTeachings: Teaching[];
@@ -46,6 +47,7 @@ interface MyLibrarySectionProps {
   onNavigate: (tab: string) => void;
   onClearLibrary: () => void;
   onShowToast: (msg: string) => void;
+  onOpenOfflineHtml?: () => void;
 }
 
 export const MyLibrarySection: React.FC<MyLibrarySectionProps> = ({
@@ -66,6 +68,7 @@ export const MyLibrarySection: React.FC<MyLibrarySectionProps> = ({
   onNavigate,
   onClearLibrary,
   onShowToast,
+  onOpenOfflineHtml,
 }) => {
   const [filter, setFilter] = useState<'all' | 'teachings' | 'books' | 'journal'>('all');
   const [downloadSuccess, setDownloadSuccess] = useState<Record<string, boolean>>({});
@@ -92,7 +95,7 @@ export const MyLibrarySection: React.FC<MyLibrarySectionProps> = ({
         }
       });
     }
-  }, [savedTeachings, savedBooks, isOnline]);
+  }, [savedTeachings.length, savedBooks.length, journalEntries.length, isOnline]);
 
   const handleManualSync = async () => {
     setIsSyncing(true);
@@ -225,13 +228,22 @@ Website: S.M.A.R.T Portal | Saved in My Library
 
         <div className="flex items-center gap-2 shrink-0 flex-wrap">
           <button
+            onClick={() => onOpenOfflineHtml ? onOpenOfflineHtml() : downloadOfflineHtmlService.downloadStandaloneHtml()}
+            className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500/20 to-amber-600/30 hover:from-amber-500/30 text-amber-300 hover:text-white border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+            title="Download full standalone HTML app for offline study"
+          >
+            <Download className="w-3.5 h-3.5 text-amber-400" />
+            <span>Download Standalone HTML</span>
+          </button>
+
+          <button
             onClick={handleManualSync}
             disabled={isSyncing}
             className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50"
             title="Refresh local offline cache"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${isSyncing ? 'animate-spin' : ''}`} />
-            <span>{isSyncing ? 'Syncing...' : 'Sync Offline Cache'}</span>
+            <span>{isSyncing ? 'Syncing...' : 'Sync Cache'}</span>
           </button>
 
           <PWAInstallButton variant="badge" />

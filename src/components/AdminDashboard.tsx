@@ -147,6 +147,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [newBookCover, setNewBookCover] = useState<string>('/assets/aistudio/FB_IMG_1793479297508_fa43cc88.jpg');
   const [newBookSynopsis, setNewBookSynopsis] = useState('');
   const [newBookB2RUrl, setNewBookB2RUrl] = useState('');
+  const [newBookTags, setNewBookTags] = useState('#ApostolicArchitecture, #Leadership');
   const [newBookNotify, setNewBookNotify] = useState(true);
   const bookCoverInputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -155,6 +156,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [teachSubtitle, setTeachSubtitle] = useState('');
   const [teachFormat, setTeachFormat] = useState<'audio' | 'video' | 'pdf'>('video');
   const [teachCategory, setTeachCategory] = useState<Teaching['category']>('Apostolic Order');
+  const [teachTags, setTeachTags] = useState('#MinistryDelays, #ApostolicOrder');
   const [teachScriptures, setTeachScriptures] = useState('1 Corinthians 3:10, Ephesians 4:11-12');
   const [teachDescription, setTeachDescription] = useState('');
   const [teachYoutubeUrl, setTeachYoutubeUrl] = useState('');
@@ -318,6 +320,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       author: 'Nicholas Dlamini',
       coverImage: newBookCover || '/assets/aistudio/FB_IMG_1793479297508_fa43cc88.jpg',
       type: newBookType,
+      tags: newBookTags.split(',').map((t) => {
+        const clean = t.trim();
+        return clean.startsWith('#') ? clean : `#${clean}`;
+      }).filter((t) => t.length > 1),
       publishYear: `${new Date().getFullYear()}`,
       pages: 240,
       price: newBookPrice,
@@ -396,6 +402,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       subtitle: teachSubtitle || 'Apostolic exposition on sound doctrine',
       format: teachFormat,
       category: teachCategory,
+      tags: teachTags.split(',').map((t) => {
+        const clean = t.trim();
+        return clean.startsWith('#') ? clean : `#${clean}`;
+      }).filter((t) => t.length > 1),
       author: 'Apostle Nicholas Dlamini',
       date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
       duration: teachDuration || (teachFormat === 'audio' ? '45 min audio' : teachFormat === 'video' ? '1h 10m video' : '28 pages PDF'),
@@ -1944,6 +1954,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                     <div>
                       <label className="block text-xs font-medium text-slate-300 mb-1">
+                        Thematic Search Tags (comma-separated, e.g. #MinistryDelays, #ApostolicOrder, #HolyGhostFire)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="#MinistryDelays, #HolyGhostFire, #FivefoldArchitecture"
+                        value={teachTags}
+                        onChange={(e) => setTeachTags(e.target.value)}
+                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-slate-300 mb-1">
                         Doctrinal Description
                       </label>
                       <textarea
@@ -2356,6 +2379,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           placeholder="https://books2read.com/u/..."
                           value={newBookB2RUrl}
                           onChange={(e) => setNewBookB2RUrl(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-slate-300 mb-1">
+                          Thematic Search Tags (comma-separated, e.g. #SecularBabylon, #Leadership, #PropheticPrayer)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="#SecularBabylon, #Leadership, #PropheticPrayer"
+                          value={newBookTags}
+                          onChange={(e) => setNewBookTags(e.target.value)}
                           className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-amber-500 font-mono"
                         />
                       </div>

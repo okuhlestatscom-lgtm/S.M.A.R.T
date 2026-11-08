@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { TeachingsSection } from './components/TeachingsSection';
@@ -18,6 +18,8 @@ import { GoogleSignInModal } from './components/GoogleSignInModal';
 import { WhatsAppWidget, WHATSAPP_NUMBER } from './components/WhatsAppWidget';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { Footer } from './components/Footer';
+import { ContentCatalogSection } from './components/ContentCatalogSection';
+import { OfflineHtmlModal } from './components/OfflineHtmlModal';
 import { offlineCacheService } from './services/offlineCacheService';
 import {
   Teaching,
@@ -84,6 +86,7 @@ export default function App() {
   const [isLiveBroadcastOpen, setIsLiveBroadcastOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isGoogleModalOpen, setIsGoogleModalOpen] = useState(false);
+  const [isOfflineHtmlModalOpen, setIsOfflineHtmlModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Order Book Modal State
@@ -112,9 +115,15 @@ export default function App() {
     }
   }, [currentUser]);
 
-  // Saved items arrays for MyLibrarySection & PWA Offline Caching
-  const savedTeachings = teachings.filter((t) => bookmarks.teachingIds.includes(t.id));
-  const savedBooks = books.filter((b) => bookmarks.bookIds.includes(b.id));
+  // Saved items arrays for MyLibrarySection & PWA Offline Caching (memoized to keep stable references)
+  const savedTeachings = useMemo(
+    () => teachings.filter((t) => bookmarks.teachingIds.includes(t.id)),
+    [teachings, bookmarks.teachingIds]
+  );
+  const savedBooks = useMemo(
+    () => books.filter((b) => bookmarks.bookIds.includes(b.id)),
+    [books, bookmarks.bookIds]
+  );
   const totalSavedCount = savedTeachings.length + savedBooks.length + journalEntries.length;
 
   // Persistence triggers
@@ -138,11 +147,7 @@ export default function App() {
     saveBookmarks(bookmarks);
     // Keep PWA offline cache primed for bookmarked resources
     offlineCacheService.precacheAllLibraryItems(savedTeachings, savedBooks, journalEntries);
-    // Cloud sync to Google user if authenticated
-    if (currentUser) {
-      googleAuthService.backupUserData(bookmarks, orders, petitions, journalEntries);
-    }
-  }, [bookmarks, currentUser, journalEntries, savedTeachings, savedBooks]);
+  }, [bookmarks, savedTeachings, savedBooks, journalEntries]);
 
   useEffect(() => {
     saveReports(reports);
@@ -150,24 +155,22 @@ export default function App() {
 
   useEffect(() => {
     saveOrders(orders);
-    if (currentUser) {
-      googleAuthService.backupUserData(bookmarks, orders, petitions, journalEntries);
-    }
-  }, [orders, currentUser, journalEntries]);
+  }, [orders]);
 
   useEffect(() => {
     savePetitions(petitions);
-    if (currentUser) {
-      googleAuthService.backupUserData(bookmarks, orders, petitions, journalEntries);
-    }
-  }, [petitions, currentUser, journalEntries]);
+  }, [petitions]);
 
   useEffect(() => {
     saveJournalEntries(journalEntries);
+  }, [journalEntries]);
+
+  // Consolidated Google Cloud backup: only triggers when library data or auth state changes
+  useEffect(() => {
     if (currentUser) {
       googleAuthService.backupUserData(bookmarks, orders, petitions, journalEntries);
     }
-  }, [journalEntries, currentUser]);
+  }, [bookmarks, orders, petitions, journalEntries, currentUser?.id]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -424,6 +427,7 @@ export default function App() {
         onOpenAdmin={() => setIsAdminOpen(true)}
         onOpenSubscribe={() => setIsNotificationOpen(true)}
         onOpenGoogleAuth={() => setIsGoogleModalOpen(true)}
+        onOpenOfflineHtml={() => setIsOfflineHtmlModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -438,6 +442,7 @@ export default function App() {
               onOpenLive={() => setIsLiveBroadcastOpen(true)}
               onOpenSubscribe={() => setIsNotificationOpen(true)}
               savedCount={totalSavedCount}
+              onOpenOfflineHtml={() => setIsOfflineHtmlModalOpen(true)}
             />
 
             {/* Personalized My Library Strip on Main Page */}
@@ -576,6 +581,7 @@ export default function App() {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onClearLibrary={handleClearLibrary}
+            onOpenOfflineHtml={() => setIsOfflineHtmlModalOpen(true)}
           />
         )}
 
@@ -589,6 +595,24 @@ export default function App() {
             onOpenPdf={(t) => setSelectedPdfTeaching(t)}
             onToggleBookmark={handleToggleTeachingBookmark}
           />
+        )}
+
+        {activeTab === 'catalog' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <ContentCatalogSection
+              teachings={teachings}
+              books={books}
+              bookmarkedTeachingIds={bookmarks.teachingIds}
+              bookmarkedBookIds={bookmarks.bookIds}
+              onToggleTeachingBookmark={handleToggleTeachingBookmark}
+              onToggleBookBookmark={handleToggleBookBookmark}
+              onPlayAudio={(t) => setActiveAudioTeaching(t)}
+              onOpenVideo={(t) => setSelectedVideoTeaching(t)}
+              onOpenPdf={(t) => setSelectedPdfTeaching(t)}
+              onReadBook={(b) => setSelectedReaderBook(b)}
+              onOrderBook={(b) => setOrderingBook(b)}
+            />
+          </div>
         )}
 
         {activeTab === 'books' && (
@@ -910,6 +934,14 @@ export default function App() {
         }}
         onOpenSubscribe={() => setIsNotificationOpen(true)}
         onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenOfflineHtml={() => setIsOfflineHtmlModalOpen(true)}
+      />
+
+      {/* Offline Standalone HTML App Modal */}
+      <OfflineHtmlModal
+        isOpen={isOfflineHtmlModalOpen}
+        onClose={() => setIsOfflineHtmlModalOpen(false)}
+        onShowToast={showToast}
       />
 
     </div>

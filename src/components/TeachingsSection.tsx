@@ -23,6 +23,7 @@ export const TeachingsSection: React.FC<TeachingsSectionProps> = ({
 }) => {
   const [formatFilter, setFormatFilter] = useState<'all' | 'audio' | 'video' | 'pdf'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [downloadedIds, setDownloadedIds] = useState<Record<string, boolean>>({});
 
@@ -36,19 +37,38 @@ export const TeachingsSection: React.FC<TeachingsSectionProps> = ({
     'Apostolic Order',
   ];
 
+  // Aggregate tags present in teachings
+  const availableTags = useMemo(() => {
+    const counts: Record<string, number> = {};
+    teachings.forEach((t) => {
+      (t.tags || []).forEach((tag) => {
+        counts[tag] = (counts[tag] || 0) + 1;
+      });
+    });
+    return Object.entries(counts)
+      .map(([tag, count]) => ({ tag, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [teachings]);
+
   const filteredTeachings = useMemo(() => {
     return teachings.filter((item) => {
       const matchesFormat = formatFilter === 'all' || item.format === formatFilter;
       const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
-      const matchesSearch =
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.scriptures.some((s) => s.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesTag = !selectedTag || (item.tags || []).includes(selectedTag);
 
-      return matchesFormat && matchesCategory && matchesSearch;
+      const q = searchQuery.toLowerCase().trim();
+      const cleanTagQ = q.startsWith('#') ? q.slice(1) : q;
+      const matchesSearch =
+        !q ||
+        item.title.toLowerCase().includes(q) ||
+        item.subtitle.toLowerCase().includes(q) ||
+        item.description.toLowerCase().includes(q) ||
+        item.scriptures.some((s) => s.toLowerCase().includes(q)) ||
+        (item.tags || []).some((tag) => tag.toLowerCase().includes(q) || tag.toLowerCase().includes(cleanTagQ));
+
+      return matchesFormat && matchesCategory && matchesTag && matchesSearch;
     });
-  }, [teachings, formatFilter, categoryFilter, searchQuery]);
+  }, [teachings, formatFilter, categoryFilter, selectedTag, searchQuery]);
 
   const handleDownload = (teaching: Teaching) => {
     const content = `=====================================================
@@ -262,6 +282,37 @@ Website: S.M.A.R.T Portal | Nicholas Dlamini
             </button>
           ))}
         </div>
+
+        {/* Thematic Tags Strip */}
+        {availableTags.length > 0 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs pt-1 border-t border-slate-800/60">
+            <span className="text-slate-500 shrink-0 font-mono text-[11px] mr-1">
+              #Tags:
+            </span>
+            {selectedTag && (
+              <button
+                onClick={() => setSelectedTag(null)}
+                className="px-2 py-0.5 rounded bg-amber-500 text-slate-950 text-[11px] font-bold shrink-0 flex items-center gap-1"
+              >
+                <span>{selectedTag}</span>
+                <span>×</span>
+              </button>
+            )}
+            {availableTags.map(({ tag, count }) => (
+              <button
+                key={tag}
+                onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+                className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors whitespace-nowrap shrink-0 ${
+                  selectedTag === tag
+                    ? 'bg-amber-500 text-slate-950 font-bold'
+                    : 'bg-slate-900/70 border border-slate-800 text-slate-300 hover:border-amber-500/40 hover:text-amber-300'
+                }`}
+              >
+                {tag} <span className="opacity-60 text-[10px]">({count})</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Teachings Grid */}
@@ -339,6 +390,25 @@ Website: S.M.A.R.T Portal | Nicholas Dlamini
                       </span>
                     ))}
                   </div>
+
+                  {/* Thematic Tags */}
+                  {(teaching.tags || []).length > 0 && (
+                    <div className="mt-2.5 flex flex-wrap gap-1">
+                      {teaching.tags?.map((tag) => (
+                        <button
+                          key={tag}
+                          onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded transition-colors ${
+                            selectedTag === tag
+                              ? 'bg-amber-500 text-slate-950 font-bold'
+                              : 'bg-slate-800 text-slate-300 hover:text-amber-300'
+                          }`}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Description */}
                   <p className="text-xs text-slate-400 mt-3 line-clamp-3 leading-relaxed">
